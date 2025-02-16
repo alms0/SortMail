@@ -34,14 +34,14 @@ def read_list_from_ini(section_name):
 class SettingsDialog(QtWidgets.QDialog):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Einstellungen")
+        self.setWindowTitle("Settings")
         self.setGeometry(500, 500, 400, 150)
         layout = QtWidgets.QVBoxLayout(self)
 
         # Text boxes
-        tb1_label = QtWidgets.QLabel("Posteingang")
-        tb2_label = QtWidgets.QLabel("Ablageordner")
-        tb3_label = QtWidgets.QLabel("Ausgeschlossene Ordner")
+        tb1_label = QtWidgets.QLabel("Inbox")
+        tb2_label = QtWidgets.QLabel("Archive Folder")
+        tb3_label = QtWidgets.QLabel("Excluded Folders")
         self.tb_inbox_path = QtWidgets.QLineEdit()
         self.tb_archive_path = QtWidgets.QLineEdit()
         self.tb_excluded_folders = QtWidgets.QTextEdit()
@@ -90,7 +90,7 @@ class Main_Window(QtWidgets.QWidget):
         self.setLayout(layout)
         
         # labels and text boxes
-        label_1 = QtWidgets.QLabel("aktueller Name:")
+        label_1 = QtWidgets.QLabel("Current Name:")
         self.label_current_file = QtWidgets.QLabel()
         self.label_current_file.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
         layout.addWidget(label_1, 0, 0, QtCore.Qt.AlignBottom)
@@ -100,14 +100,14 @@ class Main_Window(QtWidgets.QWidget):
         self.pb_file_progress.setGeometry(50, 50, 200, 25)
         layout.addWidget(self.pb_file_progress,1,0,QtCore.Qt.AlignBottom)
         
-        label_2 = QtWidgets.QLabel("Datum:")
+        label_2 = QtWidgets.QLabel("Date:")
         self.label_date = QtWidgets.QLabel()
         self.label_date.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
         layout.addWidget(label_2, 2, 0, QtCore.Qt.AlignBottom)
         layout.addWidget(self.label_date, 3, 0, QtCore.Qt.AlignTop)
         
         
-        label_3 = QtWidgets.QLabel("relativer Ablageordner")
+        label_3 = QtWidgets.QLabel("Relative Archive Folder")
         self.cb_archive_folder = QtWidgets.QComboBox()
         self.cb_archive_folder.setEditable(True)
         layout.addWidget(label_3, 4, 0, QtCore.Qt.AlignBottom)
@@ -119,7 +119,7 @@ class Main_Window(QtWidgets.QWidget):
         
         #self.cb_archive_folder.setMaximumHeight(font.pointSize() * 8)
         
-        label_4 = QtWidgets.QLabel("neuer Name")
+        label_4 = QtWidgets.QLabel("New Name")
         self.cb_new_name = QtWidgets.QComboBox()
         self.cb_new_name.setEditable(True)
         layout.addWidget(label_4, 6, 0, QtCore.Qt.AlignBottom)
@@ -142,18 +142,18 @@ class Main_Window(QtWidgets.QWidget):
         
         
         # buttons
-        self.button_1 = QtWidgets.QPushButton("Archivieren")
+        self.button_1 = QtWidgets.QPushButton("Archive")
         self.button_1.clicked.connect(self.show_confirmation_dialog)
         layout.addWidget(self.button_1, 8, 0, QtCore.Qt.AlignHCenter)
         self.button_1.setChecked = True
         enter_key = QtWidgets.QShortcut(QtGui.QKeySequence("Return"), self)
         enter_key.activated.connect(self.show_confirmation_dialog)
         
-        self.button_2 = QtWidgets.QPushButton("Einstellungen")
+        self.button_2 = QtWidgets.QPushButton("Settings")
         self.button_2.clicked.connect(self.show_settings_dialog)
         layout.addWidget(self.button_2, 19, 0, QtCore.Qt.AlignBottom | QtCore.Qt.AlignLeft)
         
-        self.button_3 = QtWidgets.QPushButton("Überspringen")
+        self.button_3 = QtWidgets.QPushButton("Skip")
         self.button_3.clicked.connect(self.load_new_file)
         layout.addWidget(self.button_3, 8, 0, QtCore.Qt.AlignRight)
         
@@ -167,12 +167,12 @@ class Main_Window(QtWidgets.QWidget):
             processing_time = time.time() - start_time
             print("Initialization time:", processing_time, "seconds")
         else:
-            self.label_current_file.setText("keine weiteren Dokumente")
+            self.label_current_file.setText("no further documents")
             self.pb_file_progress.hide()
         
         self.confirmation_dialog = QtWidgets.QMessageBox()
-        self.confirmation_dialog.setWindowTitle("Archivieren")
-        self.confirmation_dialog.setText("Datei speichern?")
+        self.confirmation_dialog.setWindowTitle("Archive")
+        self.confirmation_dialog.setText("Save file?")
         self.confirmation_dialog.setStandardButtons(QtWidgets.QMessageBox.Save | QtWidgets.QMessageBox.Cancel)
         self.confirmation_dialog.setDefaultButton(QtWidgets.QMessageBox.Save)
         
@@ -193,8 +193,8 @@ class Main_Window(QtWidgets.QWidget):
     def load_new_file(self):
         if self.buffer_list == []:
             if not hasattr(self, 'thread') or not self.thread.isRunning():
-                print("keine weiteren Dokumente")
-                self.label_current_file.setText("keine weiteren Dokumente")
+                print("no further documents")
+                self.label_current_file.setText("no further documents")
                 self.pb_file_progress.hide()
                 self.cb_archive_folder.clear() 
                 self.cb_new_name.clear()
@@ -202,7 +202,7 @@ class Main_Window(QtWidgets.QWidget):
                 self.figure.clf()
                 self.canvas.draw()
             else:    
-                self.label_current_file.setText("lädt...")
+                self.label_current_file.setText("loading...")
                 self.is_loading=True
                 self.pb_file_progress.show()
                 self.thread.user_is_waiting() #speeds up background thread
@@ -232,11 +232,11 @@ class Main_Window(QtWidgets.QWidget):
         if os.path.exists(full_file_name):
             msg = QtWidgets.QMessageBox()
             msg.setIcon(QtWidgets.QMessageBox.Critical)
-            msg.setText("Es existiert bereits eine Datei diesem Namen.")
-            msg.setWindowTitle("Fehler")
+            msg.setText("A file with this name already exists.")
+            msg.setWindowTitle("Error")
             msg.exec_()
         else:
-            self.confirmation_dialog.setText("Datei von\n\n" + old_file_name +"\n\n nach\n\n"+ full_file_name + "\n\n verschieben?")
+            self.confirmation_dialog.setText("Move file from\n\n" + old_file_name +"\n\n to\n\n"+ full_file_name + "\n\n?")
             if self.confirmation_dialog.exec_() == QtWidgets.QMessageBox.Save:
                 shutil.move(old_file_name, full_file_name)
                 self.load_new_file()
@@ -268,8 +268,4 @@ class Main_Window(QtWidgets.QWidget):
     def choose_folder(self):
         folder_dialog=QtWidgets.QFileDialog()
         folder_dialog.setDirectory(self.ArchivePath)
-        self.cb_archive_folder.setCurrentText(folder_dialog.getExistingDirectory(self, "Ordner wählen").lstrip(self.ArchivePath))
-        
-        
-        
-        
+        self.cb_archive_folder.setCurrentText(folder_dialog.getExistingDirectory(self, "Choose Folder").lstrip(self.ArchivePath))
